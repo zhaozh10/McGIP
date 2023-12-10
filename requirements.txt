@@ -1,0 +1,14 @@
+attrs
+future
+matplotlib
+mmcls>=0.21.0,<0.27.0
+numpy
+packaging
+scikit-learn
+scipy
+six
+tensorboard
+timm
+tqdm
+
+# please then install mmselfsup 0.x following their instruction
