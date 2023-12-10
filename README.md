@@ -18,15 +18,36 @@ The illustration of our proposed McGIP. For contrastive pre-training, a positive
 
 In this paper, we introduce a plug-and-play module called McGIP. This module efficiently constructs positive sample pairs for contrastive learning in medical image analysis based on Gaze similarity.
 
-- We provide the code for integrating McGIP into the contrastive learning framework, available [here](src/Contrastive+McGIP).
-- Furthermore, we offer code to evaluate different schemes for comparing gaze similarity in medical images, available [here](src/GazeSimilarityEval/).
+- We provide the code for integrating McGIP into the contrastive learning framework, available at [here](code/Contrastive+McGIP).
+- Furthermore, we offer code to evaluate different schemes for comparing gaze similarity in medical images, available at [here](code/GazeSimilarityEval/).
 
 This integration enhances the performance of contrastive learning, leading to improved results.
 
-## Repository Structure
+## Usage
 
 This repository contains the following:
 
-1. **Contrastive+McGIP Folder**: In this folder, you can find the contrastive learning code integrated with the McGIP module. These codes demonstrate how to incorporate McGIP into an existing contrastive learning framework to achieve superior performance.
+1. **Contrastive+McGIP**: You can find modified code of contrastive learning with McGIP under this folder. These codes demonstrate how to incorporate McGIP into an existing contrastive learning framework to achieve superior performance. we conduct experiments under mmselfsup 0.x environments. The main difference is shown in function self.\_create_buffer(N, idx_list)
 
-2. **GazeSimilarityEval Folder**: In this folder, we provide code to compare different schemes for measuring gaze similarity in medical images. We designed three different schemes tailored to various situations in medical image analysis to assist you in evaluating doctors' gaze similarity.
+2. **GazeSimilarityEval**: We provide code implementations to measure gaze similarity under different scenarios. We designed different schemes tailored to various gaze data formats (i.e., gaze sequence and gaze heatmap) and situations (i.e., unstructured and structured images) in medical image analysis.
+
+## Citation
+
+```
+coming soon
+
+```
+
+<!-- ```
+@article{zhao2023chatcad,
+      title={ChatCAD+: Towards a Universal and Reliable Interactive CAD using LLMs},
+      author={Zihao Zhao and Sheng Wang and Jinchen Gu and Yitao Zhu and Lanzhuju Mei and Zixu Zhuang and Zhiming Cui and Qian Wang and Dinggang Shen},
+      journal={arXiv preprint arXiv:2305.15964},
+      year={2023},
+}
+
+``` -->
+
+Acknowledgement
+
+This experiments are conducted on the basis of [mmselfsup 0.x](https://github.com/open-mmlab/mmselfsup/tree/0.x), thanks for their contributors.
