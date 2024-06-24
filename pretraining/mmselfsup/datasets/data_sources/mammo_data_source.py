@@ -5,13 +5,9 @@ from ..builder import DATASOURCES
 from .base import BaseDataSource
 
 def extract_info(root,item_name):
-    # namelist = glob.glob(f'{root}/*.jpg')
-    # item_name = namelist[idx]
-    # namelist[0].split('_')[0]
     elements = item_name.split('_')
     csv_name = elements[0]
 
-    # vision = int(elements[1])
     label = -1
     roi = np.zeros([4, 1])
     if (root == 'train'):
@@ -53,9 +49,6 @@ class MammoDataSource(BaseDataSource):
             info['img_info'] = {'filename': filename}
             info['gt_label'] = np.array(gt_label, dtype=np.int64)
             info['idx'] = int(i)
-            # print(info)
             data_infos.append(info)
-            # print(info['idx'])
-            # print(data_infos)
 
         return data_infos
