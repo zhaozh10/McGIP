@@ -53,7 +53,7 @@ This repository contains the following:
 3. **pretraining**: This directory provides the pretraining code modified from [mmselfsup 0.x](https://github.com/open-mmlab/mmselfsup/tree/0.x), and the pre-trained ViT weights mentioned in our journal extension can be found here.
    | ViT-Small | ViT-Base | ViT-Large|
    | ----------- | ----------- |----------- |
-   | [here](https://drive.google.com/file/d/1_ZikSRnapUE92LZoCcFMx7s6rEI_LwEH/view?usp=drive_link) | [here](https://drive.google.com/file/d/1S4DaSLuvRrh-FhsIfy5oCe-lIT-5TbCo/view?usp=drive_link) | [here](https://drive.google.com/file/d/1lV3O0OqjonJpKpBBRdUmm7bR0klLVoJP/view?usp=drive_link) |
+   | [here](https://drive.google.com/file/d/1whQaVkqGJgZcwcgQoIQEqpTV-3UfqNdP/view?usp=drive_link) | [here](https://drive.google.com/file/d/1fpqn0WLap3Use0IYPy2jH1nX8nRmTs2u/view?usp=drive_link) | [here](https://drive.google.com/file/d/1m_g6li8rkAhynIpcmjfqPJM_w2fsWYGi/view?usp=drive_link) |
 
 4. **downstream**: This directory offers code for downstream evaluation.
 
