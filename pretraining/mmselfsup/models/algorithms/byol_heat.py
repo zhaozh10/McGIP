@@ -7,7 +7,7 @@ from .base import BaseModel
 
 
 @ALGORITHMS.register_module()
-class BYOL_heat(BaseModel):
+class BYOL_GzPT(BaseModel):
     """BYOL.
 
     Implementation of `Bootstrap Your Own Latent: A New Approach to
@@ -29,12 +29,12 @@ class BYOL_heat(BaseModel):
                  neck=None,
                  head=None,
                  base_momentum=0.996,
-                 p=0,
+                 p=0.5,
                  init_cfg=None,
-                 threshold=0.95, relation='relation_cluster_heat.npy',
+                 threshold=0.95, relation='correlation_tima.npy',
                  # relation='relation_dhash.npy',
                  **kwargs):
-        super(BYOL_heat, self).__init__(init_cfg)
+        super(BYOL_GzPT, self).__init__(init_cfg)
         assert neck is not None
         # self.weights=weights
         self.threshold=threshold
@@ -57,9 +57,6 @@ class BYOL_heat(BaseModel):
         self.base_momentum = base_momentum
         self.momentum = base_momentum
         self.relation = np.load(relation)
-        # print("==================================")
-        # print(self.relation)
-        # print("==================================")
 
     def _create_buffer(self, N, idx_list):
         """
@@ -72,12 +69,6 @@ class BYOL_heat(BaseModel):
             labels generated according to similarity between gaze patterns, with shape[N,N]
 
         """
-        # weights = np.array(self.weights.split('-')).astype(float)
-        # labels = torch.zeros([2*self.args.batch_size,2*self.args.batch_size])
-        # print("====================idx==============")
-        # print(idx_list)
-        # print("====================threshold==========")
-        # print(self.threshold)
         labels = torch.zeros([N,N],dtype=torch.long)
         for i in range(N):
             idx = int(idx_list[i].item())
@@ -87,16 +78,10 @@ class BYOL_heat(BaseModel):
                     labels[i][j]=1
                 else:
                     sim = self.relation[idx][jdx]
-                    # sim = np.array(sim)
-                    # score = np.dot(sim, weights)
                     if (sim > self.threshold):
                         if (torch.rand(1)>self.p):
-                            # print(f'{idx} and {jdx}: {sim}')
                             labels[i][j] = 1
                             labels[j][i] = 1
-        # print(labels.shape)
-        # print(torch.sum(labels))
-        # print(labels)
         labels = labels.cuda()
         return labels
 

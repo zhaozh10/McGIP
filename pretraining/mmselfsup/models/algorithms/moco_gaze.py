@@ -9,13 +9,10 @@ from .base import BaseModel
 
 
 @ALGORITHMS.register_module()
-class MoCo_gaze(BaseModel):
-    """MoCo.
+class MoCo_McGIP(BaseModel):
+    """MoCo_McGIP.
 
-    Implementation of `Momentum Contrast for Unsupervised Visual
-    Representation Learning <https://arxiv.org/abs/1911.05722>`_.
-    Part of the code is borrowed from:
-    `<https://github.com/facebookresearch/moco/blob/master/moco/builder.py>`_.
+    Implementation of MoCo+McGIP
 
     Args:
         backbone (dict): Config dict for module of backbone.
@@ -24,10 +21,12 @@ class MoCo_gaze(BaseModel):
         head (dict): Config dict for module of loss functions.
             Defaults to None.
         queue_len (int): Number of negative keys maintained in the queue.
-            Defaults to 65536.
-        feat_dim (int): Dimension of compact feature vectors. Defaults to 128.
+            Defaults to 1280.
+        feat_dim (int): Dimension of compact feature vectors. Defaults to 256.
         momentum (float): Momentum coefficient for the momentum-updated
             encoder. Defaults to 0.999.
+        threshold (float): threshold for the construction of positive pairs. Defaults to 0.7
+        relation (string): The file containing gaze simialrity. 
     """
 
     def __init__(self,
@@ -38,9 +37,9 @@ class MoCo_gaze(BaseModel):
                  feat_dim=256,
                  momentum=0.999,
                  init_cfg=None,
-                 weights='0.1-0.1-0.1-0.1-0.6', threshold=0.7, relation='/home/zihao/mmself/relation.npy',
+                threshold=0.7, relation='./correlation_multimatch.npy',
                  **kwargs):
-        super(MoCo_gaze, self).__init__(init_cfg)
+        super(MoCo_McGIP, self).__init__(init_cfg)
         assert neck is not None
         self.encoder_q = nn.Sequential(
             build_backbone(backbone), build_neck(neck))
@@ -60,24 +59,16 @@ class MoCo_gaze(BaseModel):
         self.queue_len = queue_len
         self.momentum = momentum
 
-        self.relation = np.load(relation)
-
-        # create the queue
-        # res = torch.randint(0, 6080, (queue_len, 1))
+        # create a queue saving image representations
         self.register_buffer('queue', torch.randn(feat_dim, queue_len))
         self.queue = nn.functional.normalize(self.queue, dim=0)
         self.register_buffer('queue_ptr', torch.zeros(1, dtype=torch.long))
-        self.register_buffer('queue_idx', torch.randint(0, self.relation.shape[0], (queue_len, 1),dtype=torch.long))
-        # self.queue_idx=torch.zeros([1,queue_len],dtype=torch.long)
-        # self.register_buffer('queue_idx_ptr', torch.zeros(1, dtype=torch.long))
-        # self.warm_step=self.queue_len/batch_size
-        self.weights = weights
+        # create a queue saving image idx, in order to get their gaze similarity from self.relation with ease
+        self.register_buffer('queue_idx', torch.randint(0, 700, (queue_len, 1),dtype=torch.long))
         self.threshold = threshold
-
+        self.relation = np.load(relation)
 
     def _create_buffer(self, N, idx_list):
-        weights = np.array(self.weights.split('-')).astype(float)
-        # labels = torch.zeros([2*self.args.batch_size,2*self.args.batch_size])
         labels = torch.zeros([N,self.queue_len],dtype=torch.long)
         for i in range(N):
             idx = int(idx_list[i].item())
@@ -86,18 +77,10 @@ class MoCo_gaze(BaseModel):
                 if (i == j):
                     pass
                 else:
-                    # sim = m.docomparison(gazeInfo[i], gazeInfo[j], screensize=[1024, 1024],grouping=True,TDir=45,TDur=2000,TAmp=120)
                     sim = self.relation[idx][jdx]
-                    # 千万不要改成下面这句，否则运算量会大幅增加
-                    # sim = m.docomparison(gazeInfo[i], gazeInfo[j], screensize=[1024, 1024], grouping=False)
-                    sim = np.array(sim)
-                    score = np.dot(sim, weights)
-                    if (score > self.threshold):
+                    if (sim > self.threshold):
                         labels[i][j] = 1
-                        # labels[j][i] = 1
         labels = labels.cuda()
-        # mask = torch.eye(labels.shape[0], dtype=torch.bool).cuda()
-        # labels = labels[~mask].view(labels.shape[0], -1)
         return labels
 
     @torch.no_grad()
@@ -113,6 +96,7 @@ class MoCo_gaze(BaseModel):
         """Update queue."""
         # gather keys before updating queue
         keys = concat_all_gather(keys)
+
 
         batch_size = keys.shape[0]
 
@@ -171,7 +155,6 @@ class MoCo_gaze(BaseModel):
 
             # undo shuffle
             k = batch_unshuffle_ddp(k, idx_unshuffle)
-
 
         labels= self._create_buffer(q.shape[0], idx_list)
         # compute logits

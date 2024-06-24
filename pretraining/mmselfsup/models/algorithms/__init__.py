@@ -19,10 +19,9 @@ from .simmim import SimMIM
 from .simsiam import SimSiam
 from .swav import SwAV
 from .simsiam_gaze import  SimSiam_McGIP
-from .simclr_gaze import SimCLR_McGIP
 from .moco_gaze import MoCo_McGIP
-from .moco_heat import MoCo_GzPT
 from .byol_gaze import BYOL_McGIP
+from .moco_heat import MoCo_GzPT
 from .byol_heat import BYOL_GzPT
 from .byol_sup import BYOL_sup
 from .moco_sup import MoCo_sup

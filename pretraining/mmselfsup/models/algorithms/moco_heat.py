@@ -9,7 +9,7 @@ from .base import BaseModel
 
 
 @ALGORITHMS.register_module()
-class MoCo_heat(BaseModel):
+class MoCo_GzPT(BaseModel):
     """MoCo.
 
     Implementation of `Momentum Contrast for Unsupervised Visual
@@ -39,10 +39,9 @@ class MoCo_heat(BaseModel):
                  momentum=0.999,
                  init_cfg=None,
                 threshold=0.7, 
-                # relation='./relation_dhash.npy',
-                relation= './relation_cluster_heat.npy',
+                relation= './correlation_tima.npy',
                  **kwargs):
-        super(MoCo_heat, self).__init__(init_cfg)
+        super(MoCo_GzPT, self).__init__(init_cfg)
         assert neck is not None
         self.encoder_q = nn.Sequential(
             build_backbone(backbone), build_neck(neck))
@@ -63,19 +62,15 @@ class MoCo_heat(BaseModel):
         self.momentum = momentum
 
         # create the queue
-        # res = torch.randint(0, 6080, (queue_len, 1))
         self.register_buffer('queue', torch.randn(feat_dim, queue_len))
         self.queue = nn.functional.normalize(self.queue, dim=0)
         self.register_buffer('queue_ptr', torch.zeros(1, dtype=torch.long))
         self.register_buffer('queue_idx', torch.randint(0, 700, (queue_len, 1),dtype=torch.long))
-        # self.queue_idx=torch.zeros([1,queue_len],dtype=torch.long)
-        # self.register_buffer('queue_idx_ptr', torch.zeros(1, dtype=torch.long))
-        # self.warm_step=self.queue_len/batch_size
         self.threshold = threshold
         self.relation = np.load(relation)
 
     def _create_buffer(self, N, idx_list):
-        # labels = torch.zeros([2*self.args.batch_size,2*self.args.batch_size])
+
         labels = torch.zeros([N,self.queue_len],dtype=torch.long)
         for i in range(N):
             idx = int(idx_list[i].item())
@@ -85,12 +80,11 @@ class MoCo_heat(BaseModel):
                     pass
                 else:
                     sim = self.relation[idx][jdx]
-                    # 千万不要改成下面这句，否则运算量会大幅增加
                     if (sim > self.threshold):
-                        labels[i][j] = 1
+                        if (torch.rand(1)>self.p):
+                            labels[i][j] = 1
         labels = labels.cuda()
-        # mask = torch.eye(labels.shape[0], dtype=torch.bool).cuda()
-        # labels = labels[~mask].view(labels.shape[0], -1)
+
         return labels
 
     @torch.no_grad()

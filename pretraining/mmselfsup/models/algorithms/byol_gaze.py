@@ -7,12 +7,10 @@ from .base import BaseModel
 
 
 @ALGORITHMS.register_module()
-class BYOL_gaze(BaseModel):
-    """BYOL.
+class BYOL_McGIP(BaseModel):
+    """BYOL_gaze.
 
-    Implementation of `Bootstrap Your Own Latent: A New Approach to
-    Self-Supervised Learning <https://arxiv.org/abs/2006.07733>`_.
-    The momentum adjustment is in `core/hooks/byol_hook.py`.
+    Implementation of BYOL+McGIP
 
     Args:
         backbone (dict): Config dict for module of backbone.
@@ -22,22 +20,21 @@ class BYOL_gaze(BaseModel):
             Defaults to None.
         base_momentum (float): The base momentum coefficient for the target
             network. Defaults to 0.996.
+        threshold (float): threshold for the construction of positive pairs. Defaults to 0.7
+        relation (string): The file containing gaze simialrity. 
     """
 
     def __init__(self,
                  backbone,
                  neck=None,
                  head=None,
-                 p=0,
                  base_momentum=0.996,
                  init_cfg=None,
-                 weights='0.1-0.1-0.1-0.1-0.6', threshold=0.7, relation='../data/OAI/relation_match.npy',
+                 threshold=0.9, relation='correlation_multimatch.npy',
                  **kwargs):
-        super(BYOL_gaze, self).__init__(init_cfg)
+        super(BYOL_McGIP, self).__init__(init_cfg)
         assert neck is not None
-        self.weights=weights
         self.threshold=threshold
-        self.p=p
         self.online_net = nn.Sequential(
             build_backbone(backbone), build_neck(neck))
         self.target_net = nn.Sequential(
@@ -68,8 +65,6 @@ class BYOL_gaze(BaseModel):
             labels generated according to similarity between gaze patterns, with shape[N,N]
 
         """
-        weights = np.array(self.weights.split('-')).astype(float)
-        # labels = torch.zeros([2*self.args.batch_size,2*self.args.batch_size])
         labels = torch.zeros([N,N],dtype=torch.long)
         for i in range(N):
             idx = int(idx_list[i].item())
@@ -79,16 +74,11 @@ class BYOL_gaze(BaseModel):
                     labels[i][j]=1
                 else:
                     sim = self.relation[idx][jdx]
-                    sim = np.array(sim)
-                    score = np.dot(sim, weights)
-                    if (score > self.threshold):
-                        if (torch.rand(1) > self.p):
+                    if (sim > self.threshold):
+                        if (torch.rand(1)>self.p):
                             labels[i][j] = 1
                             labels[j][i] = 1
-
-        # print(torch.sum(labels))
         labels = labels.cuda()
-
         return labels
 
     @torch.no_grad()
@@ -128,13 +118,7 @@ class BYOL_gaze(BaseModel):
         img_v1 = img[0]
         img_v2 = img[1]
         labels = self._create_buffer(img_v1.shape[0], idx_list)
-        # print(labels)
         num_pair = torch.sum(labels)
-        # print("==========================")
-        # print("Num of pair")
-        # print(num_pair)
-        # print("==========================")
-        # compute online features
         proj_online_v1 = self.online_net(img_v1)[0]
         proj_online_v2 = self.online_net(img_v2)[0]
         # compute target features

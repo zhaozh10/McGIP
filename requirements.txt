@@ -1,3 +1,5 @@
+# 1. please then install mmselfsup 0.x following their instruction at https://github.com/open-mmlab/mmselfsup/tree/0.x
+
 attrs
 future
 matplotlib
@@ -10,5 +12,5 @@ six
 tensorboard
 timm
 tqdm
-
-# please then install mmselfsup 0.x following their instruction
+opencv-python
+dtw==1.4.0

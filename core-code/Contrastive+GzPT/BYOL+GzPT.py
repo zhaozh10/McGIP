@@ -8,7 +8,7 @@ from .base import BaseModel
 
 @ALGORITHMS.register_module()
 class BYOL_GzPT(BaseModel):
-    """BYOL_TIMA.
+    """BYOL_GzPT.
 
     Implementation of BYOL+GzPT
 
@@ -31,7 +31,7 @@ class BYOL_GzPT(BaseModel):
                  base_momentum=0.996,
                  init_cfg=None,
                  p=0.5,
-                 threshold=0.9, relation='correlation_TIMA.npy',
+                 threshold=0.9, relation='correlation_tima.npy',
                  **kwargs):
         super(BYOL_GzPT, self).__init__(init_cfg)
         assert neck is not None

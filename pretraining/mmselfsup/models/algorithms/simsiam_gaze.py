@@ -6,11 +6,10 @@ from .base import BaseModel
 import numpy as np
 import torch
 @ALGORITHMS.register_module()
-class SimSiam_gaze(BaseModel):
-    """SimSiam.
+class SimSiam_McGIP(BaseModel):
+    """SimSiam_gaze.
 
-    Implementation of `Exploring Simple Siamese Representation Learning
-    <https://arxiv.org/abs/2011.10566>`_.
+    Implementation of SimSiam+McGIP
     The operation of fixing learning rate of predictor is in
     `core/hooks/simsiam_hook.py`.
 
@@ -27,11 +26,10 @@ class SimSiam_gaze(BaseModel):
                  neck=None,
                  head=None,
                  init_cfg=None,
-                 weights='0.1-0.1-0.1-0.1-0.6', threshold=0.7, relation='relation.npy',
+                 threshold=0.7, relation='correlation_multimatch.npy',
                  **kwargs):
-        super(SimSiam_gaze, self).__init__(init_cfg)
+        super(SimSiam_McGIP, self).__init__(init_cfg)
         assert neck is not None
-        self.weights = weights
         self.threshold = threshold
         self.relation = np.load(relation)
         self.encoder = nn.Sequential(
@@ -65,8 +63,6 @@ class SimSiam_gaze(BaseModel):
             labels generated according to similarity between gaze patterns, with shape[N,N]
 
         """
-        weights = np.array(self.weights.split('-')).astype(float)
-        # labels = torch.zeros([2*self.args.batch_size,2*self.args.batch_size])
         labels = torch.zeros([N,N],dtype=torch.long)
         for i in range(N):
             idx = int(idx_list[i].item())
@@ -76,11 +72,10 @@ class SimSiam_gaze(BaseModel):
                     labels[i][j]=1
                 else:
                     sim = self.relation[idx][jdx]
-                    sim = np.array(sim)
-                    score = np.dot(sim, weights)
-                    if (score > self.threshold):
-                        labels[i][j] = 1
-                        # labels[j][i] = 1
+                    if (sim > self.threshold):
+                    	if (torch.rand(1)>self.p):
+                            labels[i][j] = 1
+                            labels[j][i] = 1
 
         labels = labels.cuda()
         return labels
