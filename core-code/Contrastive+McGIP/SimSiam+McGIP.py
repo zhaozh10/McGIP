@@ -6,8 +6,8 @@ from .base import BaseModel
 import numpy as np
 import torch
 @ALGORITHMS.register_module()
-class SimSiam_gaze(BaseModel):
-    """SimSiam_gaze.
+class SimSiam_McGIP(BaseModel):
+    """SimSiam_McGIP.
 
     Implementation of SimSiam+McGIP
     The operation of fixing learning rate of predictor is in
@@ -28,7 +28,7 @@ class SimSiam_gaze(BaseModel):
                  init_cfg=None,
                  threshold=0.7, relation='correlation_multimatch.npy',
                  **kwargs):
-        super(SimSiam_gaze, self).__init__(init_cfg)
+        super(SimSiam_McGIP, self).__init__(init_cfg)
         assert neck is not None
         self.threshold = threshold
         self.relation = np.load(relation)

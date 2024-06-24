@@ -35,10 +35,10 @@ by Sheng Wang\*, Zihao Zhao\*, Zhenrong Shen, Bin Wang, Qian Wang, Dinggang Shen
 
 ## Introduction
 
-In this paper, we introduce a plug-and-play module called McGIP. This module efficiently constructs positive sample pairs for contrastive learning in medical image analysis based on Gaze similarity.
+In this paper, we introduce a plug-and-play module to rectify the issue of false-negative in medical contrasitve learning. This module efficiently constructs positive sample pairs for contrastive learning in medical image analysis based on Gaze similarity.
 
-- We provide the code for integrating McGIP into the contrastive learning framework, available at [here](code/Contrastive+McGIP).
-- Furthermore, we offer code to evaluate different schemes for comparing gaze similarity in medical images, available at [here](code/GazeSimilarityEval/).
+- We provide the core code for integrating gaze data into the contrastive learning framework, available at [here](core-code/Contrastive+McGIP) and [here](core-code/Contrastive+GzPT).
+- Furthermore, we offer code to evaluate different schemes for comparing gaze similarity in medical images, available at [here](core-code/GazeSimilarityEval/).
 
 This integration enhances the performance of contrastive learning, leading to improved results.
 
@@ -46,9 +46,16 @@ This integration enhances the performance of contrastive learning, leading to im
 
 This repository contains the following:
 
-1. **Contrastive+McGIP**: You can find modified code of contrastive learning with McGIP under this folder. These codes demonstrate how to incorporate McGIP into an existing contrastive learning framework to achieve superior performance. we conduct experiments under mmselfsup 0.x environments. The main difference is shown in function self.\_create_buffer(N, idx_list)
+1. **core-code/Contrastive+McGIP(GzPT)**: You can find modified code of contrastive learning under this folder. These codes demonstrate how to incorporate gaze data into an existing contrastive learning framework to achieve superior performance. we conduct experiments under mmselfsup 0.x environments. The main difference is shown in function self.\_create_buffer(N, idx_list)
 
-2. **GazeSimilarityEval**: We provide code implementations to measure gaze similarity under different scenarios. We designed different schemes tailored to various gaze data formats (i.e., gaze sequence and gaze heatmap) and situations (i.e., unstructured and structured images) in medical image analysis.
+2. **core-code/GazeSimilarityEval**: We provide code implementations to measure gaze similarity under different scenarios. We designed different schemes tailored to various gaze data formats (i.e., gaze sequence and gaze heatmap) and situations (i.e., unstructured and structured images) in medical image analysis. We also propose an advanced method named temporal image moment analysis in the journal extension.
+
+3. **pretraining**: This directory provides the pretraining code modified from [mmselfsup 0.x](https://github.com/open-mmlab/mmselfsup/tree/0.x), and the pre-trained ViT weights mentioned in our journal extension can be found here.
+   | ViT-Small | ViT-Base | ViT-Large|
+   | ----------- | ----------- |----------- |
+   | [here](https://drive.google.com/file/d/1_ZikSRnapUE92LZoCcFMx7s6rEI_LwEH/view?usp=drive_link) | [here](https://drive.google.com/file/d/1S4DaSLuvRrh-FhsIfy5oCe-lIT-5TbCo/view?usp=drive_link) | [here](https://drive.google.com/file/d/1lV3O0OqjonJpKpBBRdUmm7bR0klLVoJP/view?usp=drive_link) |
+
+4. **downstream**: This directory offers code for downstream evaluation.
 
 ## Citation
 

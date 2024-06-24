@@ -9,8 +9,8 @@ from .base import BaseModel
 
 
 @ALGORITHMS.register_module()
-class MoCo_gaze(BaseModel):
-    """MoCo.
+class MoCo_McGIP(BaseModel):
+    """MoCo_McGIP.
 
     Implementation of MoCo+McGIP
 
@@ -39,7 +39,7 @@ class MoCo_gaze(BaseModel):
                  init_cfg=None,
                 threshold=0.7, relation='./correlation_multimatch.npy',
                  **kwargs):
-        super(MoCo_gaze, self).__init__(init_cfg)
+        super(MoCo_McGIP, self).__init__(init_cfg)
         assert neck is not None
         self.encoder_q = nn.Sequential(
             build_backbone(backbone), build_neck(neck))
